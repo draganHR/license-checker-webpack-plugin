@@ -25,7 +25,7 @@ class LicenseCheckerWebpackPlugin {
       outputWriter
     } = this.options;
 
-    compiler.hooks.emit.tapPromise("LicenseCheckerWebpackPlugin", async compilation => {
+    compiler.plugin('emit', (compilation, callback) => {
       let licenseInformation = getLicenseInformationForCompilation(compilation, filter);
       licenseInformation = ignoreLicenses(licenseInformation, ignore);
       licenseInformation = overrideLicenses(licenseInformation, override);
@@ -39,8 +39,9 @@ class LicenseCheckerWebpackPlugin {
 
       const sortedLicenseInformation = getSortedLicenseInformation(licenseInformation);
       compilation.assets[outputFilename] = new RawSource(
-        await writeLicenseInformation(outputWriter, sortedLicenseInformation)
+        writeLicenseInformation(outputWriter, sortedLicenseInformation)
       );
+      callback();
     });
   }
 }
